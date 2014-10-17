@@ -8,16 +8,92 @@
 
 #import "AppDelegate.h"
 
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
+
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
+    LoginVC *login=[[LoginVC alloc] init];
+   UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:login];
+    self.revealSideViewController = [[PPRevealSideViewController alloc] initWithRootViewController:nav];
+
+    [self.revealSideViewController setDirectionsToShowBounce:PPRevealSideDirectionRight];
+    [self.revealSideViewController setPanInteractionsWhenClosed:PPRevealSideInteractionContentView | PPRevealSideInteractionNavigationBar];
+    
+    self.window.rootViewController = self.revealSideViewController;
+
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    //if (FBSession.activeSession.state == FBSessionStateCreatedTokenLoaded) {
+//        NSLog(@"Found a cached session");
+//        // If there's one, just open the session silently, without showing the user the login UI
+//        [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
+//                                           allowLoginUI:NO
+//                                      completionHandler:^(FBSession *session, FBSessionState state, NSError *error) {
+//                                          // Handler for session state changes
+//                                          // This method will be called EACH time the session state changes,
+//                                          // also for intermediate states and NOT just when the session open
+//                                          [self sessionStateChanged:session state:state error:error];
+//                                      }];
+//        
+//        // If there's no cached session, we will show a login button
+//    } else {
+//       // UIButton *loginButton = [self.customLoginViewController loginButton];
+//        //[loginButton setTitle:@"Log in with Facebook" forState:UIControlStateNormal];
+//    }
+
+  
     return YES;
 }
+
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    BOOL wasHandled = [FBAppCall handleOpenURL:url sourceApplication:sourceApplication];
+    
+    return [GPPURLHandler handleURL:url
+                  sourceApplication:sourceApplication
+                         annotation:annotation];
+    // add any app-specific handling code here
+    return wasHandled;
+}
+
+- (void)sessionStateChanged:(FBSession *)session state:(FBSessionState) state error:(NSError *)error
+{
+    // If the session was opened successfully
+    if (!error && state == FBSessionStateOpen){
+        NSLog(@"Session opened");
+        // Show the user the logged-in UI
+       // [self userLoggedIn];
+        return;
+   }
+if (state == FBSessionStateClosed || state == FBSessionStateClosedLoginFailed){
+    // If the session is closed
+       NSLog(@"Session closed");
+      // Show the user the logged-out UI
+       // [self userLoggedOut];
+   }
+}
+////
+
+//    }
+//    - (void) userLoggedOut
+//    {
+//           }
+//    - (void)userLoggedIn
+//    {
+//        
+
+        // Welcome message
+       // [self showMessage:@"You're now logged in" withTitle:@"Welcome!"];
+        
+
+
+
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
